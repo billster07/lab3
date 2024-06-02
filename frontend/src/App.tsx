@@ -26,7 +26,7 @@ const Root = () => {
   const getUser = async () => {
     if (!userInfo) {
       try {
-        const { data } = await axios.get("http://localhost:3000/user", {
+        const { data } = await axios.get("/user", {
           withCredentials: true,
         });
         setUserInfo(data);
