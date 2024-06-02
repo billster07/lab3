@@ -1,35 +1,78 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import axios from "axios";
+import Fixtures from "./pages/Fixtures";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Navbar from "./components/Navbar";
+import { useEffect, useState } from "react";
+import {
+  createHashRouter,
+  Outlet,
+  RouterProvider,
+  useNavigate,
+} from "react-router-dom";
+import Registration from "./pages/Registration";
+import SomeContext from "./SomeContext";
+import Leaderboard from "./pages/Leaderboard";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+interface UserInfo {
+  token: string;
+  user_id: number;
 }
 
-export default App
+const Root = () => {
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const navigate = useNavigate();
+
+  const getUser = async () => {
+    if (!userInfo) {
+      try {
+        const { data } = await axios.get("http://localhost:3000/user", {
+          withCredentials: true,
+        });
+        setUserInfo(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  useEffect(() => {
+    if (!userInfo) {
+      navigate("/login");
+    } else {
+      navigate("/");
+    }
+  }, [userInfo, navigate]);
+
+  return (
+    // <div style={{display: "flex", flexDirection: "column"}}>
+    <SomeContext.Provider value={{ setUserInfo, userInfo }}>
+      {userInfo && <Navbar />}
+      <main>
+        <Outlet />
+      </main>
+    </SomeContext.Provider>
+  );
+};
+function App() {
+  const router = createHashRouter([
+    {
+      children: [
+        { element: <Home />, path: "/" },
+        { element: <Fixtures />, path: "/matcher" },
+        { element: <Login />, path: "/login" },
+        { element: <Registration />, path: "/registrering" },
+        { element: <Leaderboard />, path: "/leaderboard" },
+      ],
+      element: <Root />,
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
+}
+
+export default App;

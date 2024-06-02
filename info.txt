@@ -1,0 +1,54 @@
+EM tipset 2024 
+
+token: 0f47rPX6yuHVPi2EqHSUBZpr1DzEh5FfI9XOkMqGv67kvJRmJ2mYAZN9LEIc
+
+tipsa alla matcher för em och vinn. 
+
+vad ska sidan innehålla: 
+Startsida - Grundinformation(sammanfattning sen kan man klicka vidare till hela sidan), Leaderboard, senaste matcherna, nyheter
+
+Betta - där du fyller i ditt tips och ser dina tidigare resultat. 
+
+Stats/lag - där man kan kika in grupperna sedan klicka sig vidare in på lagen och se trupper osv. 
+
+Informationssida - där man kan läsa regler osv. 
+
+Databas: 
+CREATE TABLE users (
+    id serial PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL CHECK(length(username) > 0),
+    password TEXT NOT NULL CHECK(length(password) >= 6),
+    phone_number TEXT NOT NULL CHECK(length(phone_number) = 10)
+)
+
+CREATE TABLE teams (
+    id SERIAL PRIMARY KEY
+    team TEXT NOT NULL 
+) 
+
+players
+
+CREATE TABLE matches (
+    id SERIAL PRIMARY KEY,
+    home_team INTEGER NOT NULL,
+    away_team INTEGER NOT NULL,
+    goals_home INTEGER,
+    goals_away INTEGER,
+    stage TEXT NOT NULL,
+    date TEXT NOT NULL,
+    kick_off TEXT NOT NULL,
+    FOREIGN KEY(home_team) REFERENCES teams(id),
+    FOREIGN KEY(away_team) REFERENCES teams(id)
+)
+INSERT INTO matches (home_team, away_team, stage, date, kick_off) VALUES ()
+
+CREATE TABLE bets (
+    user_id INTEGER,
+    match_id INTEGER,
+    result TEXT NOT NULL CHECK(length(result) = 1),
+    date TEXT NOT NULL DEFAULT CURRENT_DATE,
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(match_id) REFERENCES matches(id)
+)
+
+Grupper
