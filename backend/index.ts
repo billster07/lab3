@@ -54,7 +54,7 @@ const authenticate = async (
 ) => {
   let user: number | null = null;
   if (req.cookies.token) {
-    if(req.cookies.token.length > 1) {
+    if (req.cookies.token.length > 1) {
       const { rows } = await client.query(
         "SELECT user_id FROM tokens WHERE token=$1",
         [req.cookies.token]
@@ -244,7 +244,7 @@ app.get("/leaderboard", authenticate, async (req, res) => {
   }
 });
 
-app.use(express.static(path.join(path.resolve(), 'dist')))
+app.use(express.static(path.join(path.resolve(), "dist")));
 
 app.listen(3000, () => {
   console.log("Webbtjänsten kan nu ta emot anrop");
