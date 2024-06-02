@@ -18,6 +18,8 @@ client.connect();
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(express.static(path.join(path.resolve(), "dist")));
+
 const corsOption = {
   origin: "http://localhost:5173",
   credentials: true,
@@ -32,7 +34,7 @@ let sessionToken: string | null;
 declare global {
   namespace Express {
     interface Request {
-      user: number;
+      user: number | null;
     }
   }
 }
@@ -108,8 +110,9 @@ app.post("/login", async (req, res) => {
 app.post("/logout", authenticate, async (req, res) => {
   await client.query("DELETE FROM tokens WHERE token=$1", [req.body.token]);
   options.expire = new Date("2020-01-01");
-  sessionToken = null;
   res.cookie("token", "", options).status(200).send("OK");
+  sessionToken = null;
+  req.user = null;
 });
 
 app.get("/user", authenticate, async (req, res) => {
@@ -244,8 +247,6 @@ app.get("/leaderboard", authenticate, async (req, res) => {
     res.status(400).send("Bad Request");
   }
 });
-
-app.use(express.static(path.join(path.resolve(), "dist")));
 
 app.listen(port, () => {
   console.log(`Webbtjänsten kan nu ta emot anrop på http://localhost:${port}`);

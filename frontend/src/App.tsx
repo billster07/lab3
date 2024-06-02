@@ -38,7 +38,7 @@ const Root = () => {
 
   useEffect(() => {
     getUser();
-  }, []);
+  }, [getUser]);
 
   useEffect(() => {
     if (!userInfo) {

@@ -168,6 +168,7 @@ const Fixtures = () => {
   const context = useContext(SomeContext);
 
   const getMatches = async () => {
+    console.log("start funktion")
     try {
       const response = await axios.get("http://localhost:3000/matches", {
         withCredentials: true,
@@ -236,11 +237,13 @@ const Fixtures = () => {
 
   const togglePopup = () => {
     setIsActive(!isActive);
+    getMatches();
   };
 
   useEffect(() => {
+    console.log("useeffect")
     getMatches();
-  }, [togglePopup]);
+  }, []);
 
   if (!context) {
     console.error("Context is null");
