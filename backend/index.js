@@ -42,22 +42,28 @@ let options = {
 };
 const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let user = null;
-    if (req.cookies.token) {
-        if (req.cookies.token.length > 1) {
-            const { rows } = yield client.query("SELECT user_id FROM tokens WHERE token=$1", [req.cookies.token]);
+    try {
+        if (req.cookies.token) {
+            if (req.cookies.token.length > 1) {
+                const { rows } = yield client.query("SELECT user_id FROM tokens WHERE token=$1", [req.cookies.token]);
+                user = rows[0].user_id;
+            }
+        }
+        else if (sessionToken) {
+            const { rows } = yield client.query("SELECT user_id FROM tokens WHERE token=$1", [sessionToken]);
             user = rows[0].user_id;
         }
+        if (!user) {
+            res.status(401).send("Unauthorized");
+            return;
+        }
+        req.user = user;
+        next();
     }
-    else if (sessionToken) {
-        const { rows } = yield client.query("SELECT user_id FROM tokens WHERE token=$1", [sessionToken]);
-        user = rows[0].user_id;
-    }
-    if (!user) {
+    catch (error) {
+        console.error(error);
         res.status(401).send("Unauthorized");
-        return;
     }
-    req.user = user;
-    next();
 });
 app.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

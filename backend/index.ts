@@ -56,31 +56,36 @@ const authenticate = async (
   next: NextFunction
 ) => {
   let user: number | null = null;
-  if (req.cookies.token) {
-    if (req.cookies.token.length > 1) {
+  try {
+    if (req.cookies.token) {
+      if (req.cookies.token.length > 1) {
+        const { rows } = await client.query(
+          "SELECT user_id FROM tokens WHERE token=$1",
+          [req.cookies.token]
+        );
+        user = rows[0].user_id;
+      }
+    } else if (sessionToken) {
       const { rows } = await client.query(
         "SELECT user_id FROM tokens WHERE token=$1",
-        [req.cookies.token]
+        [sessionToken]
       );
       user = rows[0].user_id;
     }
-  } else if (sessionToken) {
-    const { rows } = await client.query(
-      "SELECT user_id FROM tokens WHERE token=$1",
-      [sessionToken]
-    );
-    user = rows[0].user_id;
+  
+    if (!user) {
+      res.status(401).send("Unauthorized");
+  
+      return;
+    }
+  
+    req.user = user;
+  
+    next();
+  } catch(error) {
+    console.error(error)
+    res.status(401).send("Unauthorized")
   }
-
-  if (!user) {
-    res.status(401).send("Unauthorized");
-
-    return;
-  }
-
-  req.user = user;
-
-  next();
 };
 
 app.post("/login", async (req, res) => {
