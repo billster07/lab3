@@ -97,7 +97,7 @@ const Registration = () => {
 
     try {
       await axios.post(
-        "http://localhost:3000/users",
+        "/users",
         { username: username, password: password, phone_number: phoneNumber },
         { withCredentials: true }
       );
