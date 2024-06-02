@@ -16,6 +16,7 @@ const client = new Client({
 client.connect();
 
 const app = express();
+const port = process.env.PORT || 3000;
 
 const corsOption = {
   origin: "http://localhost:5173",
@@ -246,6 +247,6 @@ app.get("/leaderboard", authenticate, async (req, res) => {
 
 app.use(express.static(path.join(path.resolve(), "dist")));
 
-app.listen(3000, () => {
-  console.log("Webbtjänsten kan nu ta emot anrop");
+app.listen(port, () => {
+  console.log(`Webbtjänsten kan nu ta emot anrop på http://localhost:${port}`);
 });
