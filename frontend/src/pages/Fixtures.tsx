@@ -204,11 +204,16 @@ const Fixtures = () => {
   };
 
   const handleSubmit = async (match: Match, array: Array<string>) => {
-    await axios.post(
-      "/bets",
-      { match_id: match.id, result: array[match.id - 1] },
-      { withCredentials: true }
-    );
+    try {
+      await axios.post(
+        "/bets",
+        { match_id: match.id, result: array[match.id - 1] },
+        { withCredentials: true }
+      );
+    } catch(error){
+      console.error(error)
+    }
+    
   };
 
   const checkBet = (match: Match) => {

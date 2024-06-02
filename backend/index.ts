@@ -72,19 +72,19 @@ const authenticate = async (
       );
       user = rows[0].user_id;
     }
-  
+
     if (!user) {
       res.status(401).send("Unauthorized");
-  
+
       return;
     }
-  
+
     req.user = user;
-  
+
     next();
-  } catch(error) {
-    console.error(error)
-    res.status(401).send("Unauthorized")
+  } catch (error) {
+    console.error(error);
+    res.status(401).send("Unauthorized");
   }
 };
 
