@@ -26,13 +26,26 @@ const DivMobile = styled.div`
 `;
 
 const DivDesktop = styled.div`
+  display: flex;
+  align-items: center;
+  height: 100%;
   @media (min-width: 700px) {
-    display: inline;
+    display: flex;
   }
   @media (max-width: 699px) {
     display: none;
   }
 `;
+
+const Ul = styled.ul`
+  display: flex;
+  list-style: none;
+
+  & li {
+    margin-right: 10px;
+    font-size: 20px;
+  }
+`
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -47,7 +60,7 @@ const Navbar = () => {
     try {
       if (userInfo) {
         await axios.post(
-          "http://localhost:3000/logout",
+          "/logout",
           { token: userInfo.token },
           { withCredentials: true }
         );
@@ -66,15 +79,15 @@ const Navbar = () => {
           <HamburgerMenu handleClickProp={handleClick} />
         </DivMobile>
         <DivDesktop>
-          <ul>
+          <Ul>
             <li>
-              <Link to="/">Hem</Link>
+              <Link to="/" style={{ textDecoration: "none", color: "white" }}>Hem</Link>
             </li>
             <li>
-              <Link to="/matcher">Matcher</Link>
+              <Link to="/matcher" style={{ textDecoration: "none", color: "white" }}>Matcher</Link>
             </li>
             <li>
-              <Link to="/leaderboard">Leaderboard</Link>
+              <Link to="/leaderboard" style={{ textDecoration: "none", color: "white" }}>Leaderboard</Link>
             </li>
             <li>
               <a
@@ -84,7 +97,7 @@ const Navbar = () => {
                 Logga ut
               </a>
             </li>
-          </ul>
+          </Ul>
         </DivDesktop>
       </Nav>
     </>

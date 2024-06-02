@@ -56,7 +56,7 @@ const EditScore = ({ togglePopup, matchProps }: EditScoreProps) => {
   const handleSubmit = async () => {
     if (matchProps) {
       await axios.post(
-        "http://localhost:3000/matches",
+        "/matches",
         {
           goals_home: goalsHome,
           goals_away: goalsAway,

@@ -46,7 +46,7 @@ interface LeaderboardUser {
 const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[] | null>([]);
   const getLeaderboard = async () => {
-    const { data } = await axios.get("http://localhost:3000/leaderboard");
+    const { data } = await axios.get("/leaderboard");
     const users: Array<LeaderboardUser> = [];
     await data.forEach((user: LeaderboardData) => {
       const findUser = users.find((user_) => user_.username === user.username);

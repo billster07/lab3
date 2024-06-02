@@ -170,7 +170,7 @@ const Fixtures = () => {
   const getMatches = async () => {
     console.log("start funktion")
     try {
-      const response = await axios.get("http://localhost:3000/matches", {
+      const response = await axios.get("/matches", {
         withCredentials: true,
       });
       setMatches(response.data);
@@ -182,7 +182,7 @@ const Fixtures = () => {
         return Array.from(uniqueDates);
       });
       const { data: existingBets } = await axios.get(
-        "http://localhost:3000/bets",
+        "/bets",
         { withCredentials: true }
       );
       const createSelectedBet: Array<string> = [];
@@ -205,7 +205,7 @@ const Fixtures = () => {
 
   const handleSubmit = async (match: Match, array: Array<string>) => {
     await axios.post(
-      "http://localhost:3000/bets",
+      "/bets",
       { match_id: match.id, result: array[match.id - 1] },
       { withCredentials: true }
     );
