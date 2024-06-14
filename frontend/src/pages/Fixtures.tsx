@@ -148,6 +148,7 @@ interface Match {
   match_date: string;
   kick_off: string;
   groups: string;
+  last_bet: string;
 }
 
 interface Bet {
@@ -249,6 +250,18 @@ const Fixtures = () => {
     console.log("useeffect")
     getMatches();
   }, []);
+
+  // const checkLastBet = (match: Match) => {
+  //   const bet = new Date(match.last_bet)
+  //   const event = new Date()
+  //   console.log(match)
+
+  //   if (event > bet) {
+  //     return true
+  //   } else {
+  //     return false
+  //   }
+  // }
 
   if (!context) {
     console.error("Context is null");

@@ -1,5 +1,6 @@
 import { Client } from "pg";
 import { v4 as uuidv4 } from "uuid";
+import bcrypt from 'bcrypt'
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -92,10 +93,19 @@ app.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
     const { rows } = await client.query(
-      `SELECT * FROM users WHERE username=$1 AND password=$2`,
-      [username, password]
+      `SELECT * FROM users WHERE username=$1`,
+      [username]
     );
-    if (rows.length === 1) {
+    if (rows.length === 1 && await bcrypt.compare(password, rows[0].password)) {
+      const userId = rows[0].id;
+      const token = uuidv4();
+      sessionToken = token;
+      await client.query("INSERT INTO tokens VALUES ($1, $2)", [userId, token]);
+      res
+        .cookie("token", token, options)
+        .status(201)
+        .send({ token: token, user_id: userId });
+    } else if (rows.length === 1) {
       const userId = rows[0].id;
       const token = uuidv4();
       sessionToken = token;
@@ -145,9 +155,11 @@ app.get("/users", async (req, res) => {
 
 app.post("/users", async (req, res) => {
   try {
+    const { username, password, phone_number } = req.body
+    const hash = bcrypt.hashSync(password, 13)
     await client.query(
       "INSERT INTO users (username, password, phone_number) VALUES ($1, $2, $3)",
-      [req.body.username, req.body.password, req.body.phone_number]
+      [username, hash, phone_number]
     );
     res.status(201).send();
   } catch (error) {

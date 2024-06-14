@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const pg_1 = require("pg");
 const uuid_1 = require("uuid");
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -68,8 +69,18 @@ const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
 app.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, password } = req.body;
-        const { rows } = yield client.query(`SELECT * FROM users WHERE username=$1 AND password=$2`, [username, password]);
-        if (rows.length === 1) {
+        const { rows } = yield client.query(`SELECT * FROM users WHERE username=$1`, [username]);
+        if (rows.length === 1 && (yield bcrypt_1.default.compare(password, rows[0].password))) {
+            const userId = rows[0].id;
+            const token = (0, uuid_1.v4)();
+            sessionToken = token;
+            yield client.query("INSERT INTO tokens VALUES ($1, $2)", [userId, token]);
+            res
+                .cookie("token", token, options)
+                .status(201)
+                .send({ token: token, user_id: userId });
+        }
+        else if (rows.length === 1) {
             const userId = rows[0].id;
             const token = (0, uuid_1.v4)();
             sessionToken = token;
@@ -116,7 +127,9 @@ app.get("/users", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 app.post("/users", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield client.query("INSERT INTO users (username, password, phone_number) VALUES ($1, $2, $3)", [req.body.username, req.body.password, req.body.phone_number]);
+        const { username, password, phone_number } = req.body;
+        const hash = bcrypt_1.default.hashSync(password, 13);
+        yield client.query("INSERT INTO users (username, password, phone_number) VALUES ($1, $2, $3)", [username, hash, phone_number]);
         res.status(201).send();
     }
     catch (error) {

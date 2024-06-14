@@ -157,6 +157,7 @@ const Login = () => {
       );
       navigate("/");
       setUserInfo(data);
+      setErrorMsg(false);
     } catch (error) {
       console.log(error);
       setErrorMsg(true);

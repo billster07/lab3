@@ -81,7 +81,7 @@ const Navbar = () => {
         <DivDesktop>
           <Ul>
             <li>
-              <Link to="/" style={{ textDecoration: "none", color: "white" }}>Hem</Link>
+              <Link to="/" style={{ textDecoration: "none", color: "white", marginLeft: "5px" }}>Hem</Link>
             </li>
             <li>
               <Link to="/matcher" style={{ textDecoration: "none", color: "white" }}>Matcher</Link>
@@ -91,7 +91,7 @@ const Navbar = () => {
             </li>
             <li>
               <a
-                style={{ textDecoration: "none", color: "white" }}
+                style={{ textDecoration: "none", color: "white", cursor: "pointer" }}
                 onClick={handleClick}
               >
                 Logga ut
