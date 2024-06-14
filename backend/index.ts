@@ -66,13 +66,14 @@ const authenticate = async (
         );
         user = rows[0].user_id;
       }
-    } else if (sessionToken) {
-      const { rows } = await client.query(
-        "SELECT user_id FROM tokens WHERE token=$1",
-        [sessionToken]
-      );
-      user = rows[0].user_id;
-    }
+    } 
+    // else if (sessionToken) {
+    //   const { rows } = await client.query(
+    //     "SELECT user_id FROM tokens WHERE token=$1",
+    //     [sessionToken]
+    //   );
+    //   user = rows[0].user_id;
+    // }
 
     if (!user) {
       res.status(401).send("Unauthorized");
