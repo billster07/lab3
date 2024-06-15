@@ -272,7 +272,7 @@ const Fixtures = () => {
       {matchDates &&
         matchDates.map((matchDate) => (
           <Div key={matchDates.indexOf(matchDate)}>
-            <h2>{matchDate}</h2>
+            <h2 style={{marginLeft: "5px"}}>{matchDate}</h2>
             {matches && (
               <div>
                 {matches
