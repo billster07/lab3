@@ -3,6 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import styled from "styled-components";
 import SomeContext from "../SomeContext";
 import EditScore from "../components/EditScore";
+import moment from 'moment-timezone';
 
 // const DivMain = styled.div`
 
@@ -147,8 +148,8 @@ interface Match {
   stage: string;
   match_date: string;
   kick_off: string;
-  groups: string;
   last_bet: string;
+  groups: string;
 }
 
 interface Bet {
@@ -169,7 +170,6 @@ const Fixtures = () => {
   const context = useContext(SomeContext);
 
   const getMatches = async () => {
-    console.log("start funktion")
     try {
       const response = await axios.get("/matches", {
         withCredentials: true,
@@ -247,21 +247,19 @@ const Fixtures = () => {
   };
 
   useEffect(() => {
-    console.log("useeffect")
     getMatches();
   }, []);
 
-  // const checkLastBet = (match: Match) => {
-  //   const bet = new Date(match.last_bet)
-  //   const event = new Date()
-  //   console.log(match)
+  const checkLastBet = (match: Match) => {
+    const bet = new Date(match.last_bet)
+    const event = moment.tz('Europe/Stockholm').format();
 
-  //   if (event > bet) {
-  //     return true
-  //   } else {
-  //     return false
-  //   }
-  // }
+    if (new Date(event) > bet) {
+      return true
+    } else {
+      return false
+    }
+  }
 
   if (!context) {
     console.error("Context is null");
@@ -314,6 +312,7 @@ const Fixtures = () => {
                               {checkBet(match) ? (
                                 <Input
                                   checked={value === selectedBet[match.id - 1]}
+                                  disabled={checkLastBet(match)}
                                   name="selectedBet"
                                   onChange={(event) => {
                                     handleChange(event, match);
@@ -324,6 +323,7 @@ const Fixtures = () => {
                               ) : (
                                 <Input
                                   name="selectedBet"
+                                  disabled={checkLastBet(match)}
                                   onChange={(event) => {
                                     handleChange(event, match);
                                   }}

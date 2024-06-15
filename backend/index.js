@@ -20,6 +20,7 @@ const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
+const moment_timezone_1 = __importDefault(require("moment-timezone"));
 dotenv_1.default.config();
 const client = new pg_1.Client({
     connectionString: process.env.PGURI,
@@ -77,7 +78,8 @@ app.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             const userId = rows[0].id;
             const token = (0, uuid_1.v4)();
             sessionToken = token;
-            yield client.query("INSERT INTO tokens VALUES ($1, $2)", [userId, token]);
+            console.log(userId);
+            yield client.query("INSERT INTO tokens (user_id, token) VALUES ($1, $2)", [userId, token]);
             res
                 .cookie("token", token, options)
                 .status(201)
@@ -87,7 +89,7 @@ app.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             const userId = rows[0].id;
             const token = (0, uuid_1.v4)();
             sessionToken = token;
-            yield client.query("INSERT INTO tokens VALUES ($1, $2)", [userId, token]);
+            yield client.query("INSERT INTO tokens (user_id, token) VALUES ($1, $2)", [userId, token]);
             res
                 .cookie("token", token, options)
                 .status(201)
@@ -142,7 +144,7 @@ app.post("/users", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 }));
 app.get("/matches", authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { rows } = yield client.query("SELECT new_table.id, home_team, team AS away_team, goals_home, goals_away, stage, match_date, kick_off, new_table.groups FROM (SELECT matches.id AS id, team AS home_team, away_team, goals_home, goals_away, stage, date AS match_date, kick_off, teams.groups FROM matches INNER JOIN teams ON matches.home_team = teams.id ORDER BY matches.last_bet) AS new_table INNER JOIN teams ON new_table.away_team = teams.id");
+        const { rows } = yield client.query("SELECT new_table.id, home_team, team AS away_team, goals_home, goals_away, stage, match_date, kick_off, last_bet, new_table.groups FROM (SELECT matches.id AS id, team AS home_team, away_team, goals_home, goals_away, stage, date AS match_date, kick_off, last_bet, teams.groups FROM matches INNER JOIN teams ON matches.home_team = teams.id ORDER BY matches.last_bet) AS new_table INNER JOIN teams ON new_table.away_team = teams.id");
         res.status(200).send(rows);
     }
     catch (error) {
@@ -192,8 +194,8 @@ app.post("/bets", authenticate, (req, res) => __awaiter(void 0, void 0, void 0, 
         if (rows.length === 1) {
             last_bet = new Date(rows[0].last_bet);
         }
-        const event = new Date();
-        if (last_bet && event > last_bet) {
+        const event = moment_timezone_1.default.tz('Europe/Stockholm').format();
+        if (last_bet && new Date(event) > last_bet) {
             res.status(403).send("Last bet passed");
         }
         else if (alreadyExist.length === 1 &&

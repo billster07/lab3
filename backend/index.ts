@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
 import path from "path";
+import moment from 'moment-timezone';
 
 dotenv.config();
 
@@ -101,7 +102,8 @@ app.post("/login", async (req, res) => {
       const userId = rows[0].id;
       const token = uuidv4();
       sessionToken = token;
-      await client.query("INSERT INTO tokens VALUES ($1, $2)", [userId, token]);
+      console.log(userId)
+      await client.query("INSERT INTO tokens (user_id, token) VALUES ($1, $2)", [userId, token]);
       res
         .cookie("token", token, options)
         .status(201)
@@ -110,7 +112,7 @@ app.post("/login", async (req, res) => {
       const userId = rows[0].id;
       const token = uuidv4();
       sessionToken = token;
-      await client.query("INSERT INTO tokens VALUES ($1, $2)", [userId, token]);
+      await client.query("INSERT INTO tokens (user_id, token) VALUES ($1, $2)", [userId, token]);
       res
         .cookie("token", token, options)
         .status(201)
@@ -172,7 +174,7 @@ app.post("/users", async (req, res) => {
 app.get("/matches", authenticate, async (req, res) => {
   try {
     const { rows } = await client.query(
-      "SELECT new_table.id, home_team, team AS away_team, goals_home, goals_away, stage, match_date, kick_off, new_table.groups FROM (SELECT matches.id AS id, team AS home_team, away_team, goals_home, goals_away, stage, date AS match_date, kick_off, teams.groups FROM matches INNER JOIN teams ON matches.home_team = teams.id ORDER BY matches.last_bet) AS new_table INNER JOIN teams ON new_table.away_team = teams.id"
+      "SELECT new_table.id, home_team, team AS away_team, goals_home, goals_away, stage, match_date, kick_off, last_bet, new_table.groups FROM (SELECT matches.id AS id, team AS home_team, away_team, goals_home, goals_away, stage, date AS match_date, kick_off, last_bet, teams.groups FROM matches INNER JOIN teams ON matches.home_team = teams.id ORDER BY matches.last_bet) AS new_table INNER JOIN teams ON new_table.away_team = teams.id"
     );
     res.status(200).send(rows);
   } catch (error) {
@@ -228,9 +230,8 @@ app.post("/bets", authenticate, async (req, res) => {
     if (rows.length === 1) {
       last_bet = new Date(rows[0].last_bet);
     }
-    const event = new Date();
-
-    if (last_bet && event > last_bet) {
+    const event = moment.tz('Europe/Stockholm').format();
+    if (last_bet && new Date(event) > last_bet) {
       res.status(403).send("Last bet passed");
     } else if (
       alreadyExist.length === 1 &&
