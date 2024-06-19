@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import styled from "styled-components";
 import SomeContext from "../SomeContext";
 import EditScore from "../components/EditScore";
@@ -168,6 +168,8 @@ const Fixtures = () => {
   const [isActive, setIsActive] = useState(false);
   const [matchProps, setMatchProps] = useState<Match | null>(null);
   const context = useContext(SomeContext);
+  // const scrollRef = useRef();
+  const scrollRef = useRef<HTMLHeadingElement>(null);
 
   const getMatches = async () => {
     try {
@@ -250,11 +252,28 @@ const Fixtures = () => {
     getMatches();
   }, []);
 
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({
+        behavior: "smooth"
+      });
+    }
+  }, [matchDates]);
+
   const checkLastBet = (match: Match) => {
     const bet = new Date(match.last_bet)
     const event = moment.tz('Europe/Stockholm').format();
 
     if (new Date(event) > bet) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  const checkDate = (matchDate: String) => {
+    const event = new Date().toISOString().split('T')[0];
+    if (event === matchDate) {
       return true
     } else {
       return false
@@ -272,7 +291,11 @@ const Fixtures = () => {
       {matchDates &&
         matchDates.map((matchDate) => (
           <Div key={matchDates.indexOf(matchDate)}>
-            <h2 style={{marginLeft: "5px"}}>{matchDate}</h2>
+            {checkDate(matchDate) ? (
+              <h2 ref={scrollRef} style={{marginLeft: "5px"}}>{matchDate}</h2>
+            ) : (
+              <h2 style={{marginLeft: "5px"}}>{matchDate}</h2>
+            )}
             {matches && (
               <div>
                 {matches
