@@ -303,7 +303,7 @@ const Fixtures = () => {
                   .map((match) => (
                     <DivMatch key={match.id}>
                       <DivTime>
-                        <Group>Grupp {match.groups}</Group>
+                        {match.stage === "Group" ? (<Group>Grupp {match.groups}</Group>) : (<Group>{match.stage}</Group>)}
                         <Time>{match.kick_off}</Time>
                         {userInfo && userInfo.user_id === 1 && (
                           <Button
